@@ -15,6 +15,7 @@ class Type extends AppModel {
  *
  * @var array
  */
+	public $displayField = 'type_name';
 	public $hasMany = array(
 		'Call' => array(
 			'className' => 'Call',

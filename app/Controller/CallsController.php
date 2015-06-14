@@ -1,12 +1,16 @@
 <?php
 App::uses('AppController', 'Controller');
+require_once(APP . 'Vendor' . DS . 'phpmailer/phpmailer/PHPMailerAutoload.php');
 /**
  * Calls Controller
  *
  * @property Call $Call
  */
 class CallsController extends AppController {
-
+	public $helpers = array('Html', 'Form');
+	public $components = array('RequestHandler');
+	public $name = 'Calls';
+	public $uses = array('Call', 'Type');
 /**
  * index method
  *
@@ -25,12 +29,11 @@ class CallsController extends AppController {
  * @return void
  */
 	public function view($id = null) {
-		if (!$this->Call->exists($id)) {
+	if (!$this->Call->exists($id)) {
 			throw new NotFoundException(__('Invalid call'));
 		}
 		$options = array('conditions' => array('Call.' . $this->Call->primaryKey => $id));
-		$this->set('call', $this->Call->find('first', $options));
-	}
+		$this->set('call', $this->Call->find('first', $options));	}
 
 /**
  * add method
@@ -74,6 +77,8 @@ class CallsController extends AppController {
 			$options = array('conditions' => array('Call.' . $this->Call->primaryKey => $id));
 			$this->request->data = $this->Call->find('first', $options);
 		}
+			echo pr($this->request->data);
+
 		$users = $this->Call->User->find('list');
 		$types = $this->Call->Type->find('list');
 		$this->set(compact('users', 'types'));
@@ -100,4 +105,72 @@ class CallsController extends AppController {
 		$this->Session->setFlash(__('Call was not deleted'));
 		$this->redirect(array('action' => 'index'));
 	}
+
+	public function close($id = null) {
+		if (!$this->Call->exists($id)) {
+			throw new NotFoundException(__('Invalid call'));
+		}
+
+				$options = array('conditions' => array('Call.' . $this->Call->primaryKey => $id));
+				$this->request->data = $this->Call->find('first', $options);
+		
+	
+				$mail = new PHPMailer();
+	
+				$mail->IsSMTP(); // Define que a mensagem será SMTP
+	
+				$mail->From = 'alvaro_souzac@hotmail.com'; // Seu e-mail
+				$mail->FromName = 'Sischamado'; // Seu nome
+				$mail->Host = "smtp.live.com";
+				$mail->Port = 587;
+				$mail->SMTPAuth = true;
+				$mail->Username = 'alvaro_souzac@hotmail.com';
+				$mail->Password = '';
+				$mail->AddAddress($this->request->data['Call']['email']);
+				$mail->SMTPSecure = 'tls';
+				$mail->IsHTML(true); // Define que o e-mail será enviado como HTML
+				$mail->Charset = 'utf-8';
+	
+				$mail->Subject  = 'Abertura de chamado ' . Configure::read('Settings.title'); // Assunto da mensagem
+	
+				$mail->Body = htmlentities("Este é um e-mail automático do Sischamado. Você recebeu este e-mail porque abriu um chamado.", ENT_NOQUOTES, "UTF-8");
+				$mail->Body .= "<br /><br />";
+				$mail->Body .= htmlentities("O seu chamado ja foi atendido", ENT_NOQUOTES, "UTF-8");;
+				$mail->Body .= "<br /><br />";
+				$mail->Body .= htmlentities("Equipe Sischamado", ENT_NOQUOTES, "UTF-8");
+
+				// Envia o e-mail
+				$enviado = $mail->Send();
+	
+				// Limpa os destinatários e os anexos
+				$mail->ClearAllRecipients();
+				$mail->ClearAttachments();
+	
+				// Exibe uma mensagem de resultado
+				if ($enviado) {
+					$this->Session->setFlash('O chamado foi fechado.', 'default', array('class' => ''));
+					$this->redirect(array('controller' => 'calls', 'action' => 'index'));
+				} else {
+					echo $mail->ErrorInfo;
+					$this->Session->setFlash(__('Erro! Não foi possível enviar o e-mail.', 'default', array('class' => '')));
+				}
+			}
+
+	public function report(){
+			$this->set('title_for_layout', Configure::read('Settings.title') . ' - Relatório dos Usuários | ' . Configure::read('Settings.mark'));
+			
+			$this->paginate = array(
+					'fields' => array('Call.type_id','COUNT(*) AS quantidade', 'Type.type_name'),
+					'group' => array('Call.type_id'),
+					'order' => array('Call.type_id'),
+					'limit' => 9999
+			);
+			
+			$this->set('result', $this->paginate());
+	}
+			
+		
+			
+		
+	
 }
