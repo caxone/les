@@ -1,14 +1,12 @@
 <div class="calls form">
-<?php echo $this->Form->create('Call', array('class'=>'form-horizontal)); ?>
+<?php echo $this->Form->create('Call', array('class'=>'form-horizontal')); ?>
 	<fieldset>
 		<legend><?php echo __('Edit Call'); ?></legend>
 	<?php
-		echo $this->Form->input('id');
-		echo $this->Form->input('name', array('label'=>'Nome','class'=>'form-control');
-		echo $this->Form->input('closed', array('label'=>'Fechamento','class'=>'form-control');
-		echo $this->Form->input('description', array('label'=>'Descrição','class'=>'form-control');
+		echo $this->Form->input('name', array('label'=>'Nome','class'=>'form-control'));
+		echo $this->Form->input('description', array('label'=>'Descrição','class'=>'form-control'));
 		echo $this->Form->input('user_id');
-		echo $this->Form->input('type_id', array('label'=>'Tipo','class'=>'form-control');
+		echo $this->Form->input('type_id', array('label'=>'Tipo','class'=>'form-control'));
 	?>
 	</fieldset>
 <?php echo $this->Form->end(__('Submit',array('class'=>'btn btn-default'))); ?>

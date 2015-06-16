@@ -33,7 +33,7 @@
 		</dd>
 		<dt><?php echo __('Type'); ?></dt>
 		<dd>
-			<?php echo $this->Html->link($call['Type']['id'], array('controller' => 'types', 'action' => 'view', $call['Type']['id'])); ?>
+			<?php echo $this->Html->link($call['Type']['type_name'], array('controller' => 'types', 'action' => 'view', $call['Type']['id'])); ?>
 			&nbsp;
 		</dd>
 	</dl>

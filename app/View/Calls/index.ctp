@@ -28,7 +28,7 @@
 			<?php echo $this->Html->link(__('View'), array('action' => 'view', $call['Call']['id'])); ?>
 			<?php echo $this->Html->link(__('Edit'), array('action' => 'edit', $call['Call']['id'])); ?>
 			<?php echo $this->Form->postLink(__('Delete'), array('action' => 'delete', $call['Call']['id']), null, __('Are you sure you want to delete # %s?', $call['Call']['id'])); ?>
-			<?php echo $this->Html->link(__('fechar'), array('action' => 'close', $call['Call']['id'])); ?>
+			<?php echo $this->Html->link(__('Fechar'), array('action' => 'close', $call['Call']['id'])); ?>
 		</td>
 	</tr>
 <?php endforeach; ?>

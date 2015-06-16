@@ -1,4 +1,5 @@
 <?php
+App::uses('DboSource', 'Model/DataSource');
 App::uses('AppController', 'Controller');
 require_once(APP . 'Vendor' . DS . 'phpmailer/phpmailer/PHPMailerAutoload.php');
 /**
@@ -113,7 +114,8 @@ class CallsController extends AppController {
 
 				$options = array('conditions' => array('Call.' . $this->Call->primaryKey => $id));
 				$this->request->data = $this->Call->find('first', $options);
-		
+				$closed = date("Y/m/d");
+				echo pr ($closed);
 	
 				$mail = new PHPMailer();
 	
@@ -148,8 +150,14 @@ class CallsController extends AppController {
 	
 				// Exibe uma mensagem de resultado
 				if ($enviado) {
-					$this->Session->setFlash('O chamado foi fechado.', 'default', array('class' => ''));
-					$this->redirect(array('controller' => 'calls', 'action' => 'index'));
+					$this->request->data['Call']['closed'] = $closed;
+					if ($this->Call->save($this->request->data)) {
+						$this->request->data['Call']['closed'] = $closed;
+						$this->Session->setFlash('O chamado foi fechado.', 'default', array('class' => ''));
+						$this->redirect(array('controller' => 'calls', 'action' => 'index'));
+					}else{
+	        			$this->Session->setFlash('Não foi possível finalizar o chamado.', 'default', array('class' => 'pmsp-alert alert-error'));
+	       			}
 				} else {
 					echo $mail->ErrorInfo;
 					$this->Session->setFlash(__('Erro! Não foi possível enviar o e-mail.', 'default', array('class' => '')));
@@ -157,7 +165,7 @@ class CallsController extends AppController {
 			}
 
 	public function report(){
-			$this->set('title_for_layout', Configure::read('Settings.title') . ' - Relatório dos Usuários | ' . Configure::read('Settings.mark'));
+			$this->set('title_for_layout', Configure::read('Settings.title') . ' - Relatório dos Chamados | ' . Configure::read('Settings.mark'));
 			
 			$this->paginate = array(
 					'fields' => array('Call.type_id','COUNT(*) AS quantidade', 'Type.type_name'),
@@ -170,6 +178,18 @@ class CallsController extends AppController {
 	}
 			
 		
+		public function report_2(){
+			$this->set('title_for_layout', Configure::read('Settings.title') . ' - Relatório dos Usuários | ' . Configure::read('Settings.mark'));
+			
+			$this->paginate = array(
+					'fields' => array('Call.user_id','COUNT(*) AS quantidade', 'User.name'),
+					'group' => array('Call.user_id'),
+					'order' => array('Call.user_id'),
+					'limit' => 9999
+			);
+			
+			$this->set('result', $this->paginate());
+	}
 			
 		
 	
